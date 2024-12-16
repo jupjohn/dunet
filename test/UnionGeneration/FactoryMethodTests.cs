@@ -110,4 +110,31 @@ public class FactoryMethodTests
         result.CompilationErrors.Should().BeEmpty();
         result.GenerationDiagnostics.Should().BeEmpty();
     }
+
+    [Fact]
+    public void GenericGeneratesStaticFactoryMethods()
+    {
+        var programCs = """
+            using Dunet;
+            using System;
+
+            Result<string> success = Result.OfInner1("thing");
+            Result<string> error = Result.OfInner2<string>("thing");
+
+            [Union]
+            partial record Result<T>
+            {
+                partial record Inner1(T Thing);
+                partial record Inner2(string Thing);
+            }
+            """;
+
+        // Act.
+        var result = Compiler.Compile(programCs);
+
+        // Assert.
+        using var scope = new AssertionScope();
+        result.CompilationErrors.Should().BeEmpty();
+        result.GenerationDiagnostics.Should().BeEmpty();
+    }
 }

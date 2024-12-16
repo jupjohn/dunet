@@ -79,6 +79,7 @@ internal static class UnionSourceBuilder
             builder.AppendLine("}");
         }
 
+        builder.AppendFactoryMethodsInNonGenericClass(union);
         builder.AppendPragmaWarningRestoreCs1591Line();
 
         return builder.ToString();
@@ -573,6 +574,102 @@ internal static class UnionSourceBuilder
             builder.AppendLine(";");
         }
 
+        return builder;
+
+        static IEnumerable<FactoryProperty> ExtractParameters(IEnumerable<Parameter> parameters)
+        {
+            return parameters
+                .Select(p => (
+                    PropertyType: p.Type.Identifier,
+                    PropertyIdentifier: p.Identifier,
+                    // PropertyName -> propertyName
+                    ParameterIdentifier: $"{char.ToLower(p.Identifier[0])}{p.Identifier[1..]}"
+                ))
+                .Select(p =>
+                {
+                    if (SyntaxFacts.GetKeywordKind(p.ParameterIdentifier) != SyntaxKind.None)
+                    {
+                        p.ParameterIdentifier += "Value";
+                    }
+
+                    return p;
+                });
+        }
+
+        static Parameter ToParameter(Property property)
+        {
+            return new Parameter(
+                new ParameterType(property.Type.Identifier, property.Type.IsInterface),
+                property.Identifier
+            );
+        }
+    }
+
+    private static StringBuilder AppendFactoryMethodsInNonGenericClass(
+        this StringBuilder builder,
+        UnionDeclaration union
+    )
+    {
+        if (union.TypeParameters.Count == 0)
+        {
+            return builder;
+        }
+
+        builder.AppendLine();
+        builder.AppendLine($"static class {union.Name}");
+        builder.AppendLine("{");
+
+        foreach (var variant in union.Variants)
+        {
+            // public static Union OfUnionVariantX(
+            //     T1 t1,
+            //     T2 t2,
+            //     ...
+            // ) => UnionVariantX(t1, t2, ...);
+
+            var unionProperties = ExtractParameters(union.Properties.Select(ToParameter)).ToArray();
+            var variantProperties = ExtractParameters(variant.Parameters).ToArray();
+
+            builder.Append($"    public static {union.Name}");
+            builder.AppendTypeParams(union.TypeParameters);
+            builder.Append($" Of{variant.Identifier}");
+            builder.AppendTypeParams(union.TypeParameters);
+            builder.AppendLine("(");
+
+            FactoryProperty[] allProperties = [..variantProperties, ..unionProperties];
+            for (var index = 0; index < allProperties.Length; index++)
+            {
+                var parameterSeparator = index != allProperties.Length - 1 ? "," : string.Empty;
+
+                var (type, _, parameterIdentifier) = allProperties[index];
+                builder.AppendLine($"        {type} {parameterIdentifier}{parameterSeparator}");
+            }
+
+            builder.Append($"    ) => new {union.Name}");
+            builder.AppendTypeParams(union.TypeParameters);
+            builder.Append($".{variant.Identifier}");
+            builder.AppendTypeParams(variant.TypeParameters);
+
+            var constructorCallParameters = variantProperties.Select(p => $"{p.Property}: {p.Parameter}");
+            builder.Append($"({string.Join(", ", constructorCallParameters)})");
+            if (unionProperties.Length > 0)
+            {
+                builder.AppendLine();
+                builder.AppendLine("    {");
+
+                foreach (var (_, propertyIdentifier, parameterIdentifier) in unionProperties)
+                {
+                    // Can always end the line with a comma (,) when using intializers
+                    builder.AppendLine($"        {propertyIdentifier} = {parameterIdentifier},");
+                }
+
+                builder.Append("    }");
+            }
+
+            builder.AppendLine(";");
+        }
+
+        builder.AppendLine("}");
         return builder;
 
         static IEnumerable<FactoryProperty> ExtractParameters(IEnumerable<Parameter> parameters)
