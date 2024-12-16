@@ -612,7 +612,7 @@ internal static class UnionSourceBuilder
 
             foreach (var (_, propertyIdentifier, parameterIdentifier) in unionProperties)
             {
-                // Can always end the line with a comma (,) when using intializers
+                // Can always end the line with a comma (,) when using initializers
                 builder.AppendLine($"        {propertyIdentifier} = {parameterIdentifier},");
             }
 
