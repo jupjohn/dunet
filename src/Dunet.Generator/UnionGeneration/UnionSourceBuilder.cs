@@ -534,7 +534,7 @@ internal static class UnionSourceBuilder
             //     T1 p2,
             //     ...
             // ) => Union<T1, ...>.UnionVariantX(p1, p2, ...);
-            GenerateVariantFactoryMethod(builder, union, variant, addGenericsToMethod: false);
+            GenerateVariantFactoryMethod(builder, union, variant, addGenericsToMethods: false);
         }
 
         return builder;
@@ -562,7 +562,7 @@ internal static class UnionSourceBuilder
             //     T1 p2,
             //     ...
             // ) => Union<T1, ...>.UnionVariantX(p1, p2, ...);
-            GenerateVariantFactoryMethod(builder, union, variant, addGenericsToMethod: true);
+            GenerateVariantFactoryMethod(builder, union, variant, addGenericsToMethods: true);
         }
 
         builder.AppendLine("}");
@@ -573,7 +573,7 @@ internal static class UnionSourceBuilder
         StringBuilder builder,
         UnionDeclaration union,
         VariantDeclaration variant,
-        bool addGenericsToMethod
+        bool addGenericsToMethods
     )
     {
         var unionProperties = ExtractParameters(union.Properties.Select(ToParameter)).ToArray();
@@ -583,7 +583,7 @@ internal static class UnionSourceBuilder
         builder.AppendTypeParams(union.TypeParameters);
         builder.Append($" Of{variant.Identifier}");
 
-        if (addGenericsToMethod)
+        if (addGenericsToMethods)
         {
             builder.AppendTypeParams(union.TypeParameters);
         }
