@@ -112,7 +112,7 @@ public class FactoryMethodTests
     }
 
     [Fact]
-    public void GenericGeneratesStaticFactoryMethods()
+    public void GeneratesStaticFactoryMethodsInNonGenericClass()
     {
         var programCs = """
             using Dunet;
