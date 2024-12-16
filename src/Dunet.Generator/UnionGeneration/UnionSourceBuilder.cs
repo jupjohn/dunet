@@ -551,6 +551,7 @@ internal static class UnionSourceBuilder
         }
 
         builder.AppendLine();
+        // TODO(jupjohn): discuss in PR about this class (and parent union) being public
         builder.AppendLine($"static class {union.Name}");
         builder.AppendLine("{");
 
