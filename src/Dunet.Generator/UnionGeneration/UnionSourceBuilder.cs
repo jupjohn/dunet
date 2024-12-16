@@ -545,6 +545,7 @@ internal static class UnionSourceBuilder
         UnionDeclaration union
     )
     {
+        // Only create this class if the union is generic
         if (union.TypeParameters.Count == 0)
         {
             return builder;
@@ -583,6 +584,7 @@ internal static class UnionSourceBuilder
         builder.AppendTypeParams(union.TypeParameters);
         builder.Append($" Of{variant.Identifier}");
 
+        // We only need generics if the factory method isn't inside the union
         if (addGenericsToMethods)
         {
             builder.AppendTypeParams(union.TypeParameters);
@@ -634,6 +636,7 @@ internal static class UnionSourceBuilder
                 ))
                 .Select(p =>
                 {
+                    // If a parameter name clashes with a keyword, it needs to be un-clashed
                     if (SyntaxFacts.GetKeywordKind(p.ParameterIdentifier) != SyntaxKind.None)
                     {
                         p.ParameterIdentifier += "Value";
