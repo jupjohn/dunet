@@ -529,11 +529,11 @@ internal static class UnionSourceBuilder
     {
         foreach (var variant in union.Variants)
         {
-            // public static Union OfUnionVariantX(
-            //     T1 t1,
-            //     T2 t2,
+            // public static Union OfUnionVariantX<T1, ...>(
+            //     Property1 p1,
+            //     T1 p2,
             //     ...
-            // ) => UnionVariantX(t1, t2, ...);
+            // ) => Union<T1, ...>.UnionVariantX(p1, p2, ...);
 
             NewMethod(builder, union, variant, addGenericsToMethod: false);
         }
@@ -557,11 +557,11 @@ internal static class UnionSourceBuilder
 
         foreach (var variant in union.Variants)
         {
-            // public static Union OfUnionVariantX(
-            //     T1 t1,
-            //     T2 t2,
+            // public static Union OfUnionVariantX<T1, ...>(
+            //     Property1 p1,
+            //     T1 p2,
             //     ...
-            // ) => UnionVariantX(t1, t2, ...);
+            // ) => Union<T1, ...>.UnionVariantX(p1, p2, ...);
 
             NewMethod(builder, union, variant, addGenericsToMethod: true);
         }
