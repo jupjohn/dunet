@@ -534,8 +534,7 @@ internal static class UnionSourceBuilder
             //     T1 p2,
             //     ...
             // ) => Union<T1, ...>.UnionVariantX(p1, p2, ...);
-
-            NewMethod(builder, union, variant, addGenericsToMethod: false);
+            GenerateVariantFactoryMethod(builder, union, variant, addGenericsToMethod: false);
         }
 
         return builder;
@@ -562,15 +561,14 @@ internal static class UnionSourceBuilder
             //     T1 p2,
             //     ...
             // ) => Union<T1, ...>.UnionVariantX(p1, p2, ...);
-
-            NewMethod(builder, union, variant, addGenericsToMethod: true);
+            GenerateVariantFactoryMethod(builder, union, variant, addGenericsToMethod: true);
         }
 
         builder.AppendLine("}");
         return builder;
     }
 
-    private static void NewMethod(
+    private static void GenerateVariantFactoryMethod(
         StringBuilder builder,
         UnionDeclaration union,
         VariantDeclaration variant,
