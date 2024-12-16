@@ -620,33 +620,34 @@ internal static class UnionSourceBuilder
         }
 
         builder.AppendLine(";");
-    }
+        return;
 
-    static IEnumerable<FactoryProperty> ExtractParameters(IEnumerable<Parameter> parameters)
-    {
-        return parameters
-            .Select(p => (
-                PropertyType: p.Type.Identifier,
-                PropertyIdentifier: p.Identifier,
-                // PropertyName -> propertyName
-                ParameterIdentifier: $"{char.ToLower(p.Identifier[0])}{p.Identifier[1..]}"
-            ))
-            .Select(p =>
-            {
-                if (SyntaxFacts.GetKeywordKind(p.ParameterIdentifier) != SyntaxKind.None)
+        static IEnumerable<FactoryProperty> ExtractParameters(IEnumerable<Parameter> parameters)
+        {
+            return parameters
+                .Select(p => (
+                    PropertyType: p.Type.Identifier,
+                    PropertyIdentifier: p.Identifier,
+                    // PropertyName -> propertyName
+                    ParameterIdentifier: $"{char.ToLower(p.Identifier[0])}{p.Identifier[1..]}"
+                ))
+                .Select(p =>
                 {
-                    p.ParameterIdentifier += "Value";
-                }
+                    if (SyntaxFacts.GetKeywordKind(p.ParameterIdentifier) != SyntaxKind.None)
+                    {
+                        p.ParameterIdentifier += "Value";
+                    }
 
-                return p;
-            });
-    }
+                    return p;
+                });
+        }
 
-    static Parameter ToParameter(Property property)
-    {
-        return new Parameter(
-            new ParameterType(property.Type.Identifier, property.Type.IsInterface),
-            property.Identifier
-        );
+        static Parameter ToParameter(Property property)
+        {
+            return new Parameter(
+                new ParameterType(property.Type.Identifier, property.Type.IsInterface),
+                property.Identifier
+            );
+        }
     }
 }
